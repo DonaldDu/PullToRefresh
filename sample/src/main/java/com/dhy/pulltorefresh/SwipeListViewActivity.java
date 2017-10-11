@@ -7,11 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Toast;
 
 import com.jaynm.pulltorefresh.PullToRefreshBase;
 import com.jaynm.pulltorefresh.PullToRefreshMenuView;
-import com.jaynm.pulltorefresh.SwipeMenu;
 import com.jaynm.pulltorefresh.SwipeMenuListView;
 
 import java.util.LinkedList;
@@ -28,7 +26,7 @@ public class SwipeListViewActivity extends Activity implements PullToRefreshBase
     Activity activity;
     private PullToRefreshMenuView refreshlistview;
 
-    private SwipeMenuListView swipeMenuListView;
+    private SwipeMenuListView listView;
 
     private LinkedList<String> pullData;
 
@@ -51,22 +49,13 @@ public class SwipeListViewActivity extends Activity implements PullToRefreshBase
         refreshlistview.setPullLoadEnabled(false);
         refreshlistview.setScrollLoadEnabled(true);
         refreshlistview.setOnRefreshListener(this);
-        swipeMenuListView = refreshlistview.getRefreshableView();
+        listView = refreshlistview.getRefreshableView();
         adapter = new ListAdapter();
-        swipeMenuListView.setAdapter(adapter);
+        listView.setAdapter(adapter);
         refreshlistview.onRefreshComplete();
-        // 操作删除按钮的点击事件
-        swipeMenuListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
-                Toast.makeText(SwipeListViewActivity.this, "删除" + pullData.get(position), Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
-
 
         // 操作ListView左滑时的手势操作，这里用于处理上下左右滑动冲突：开始滑动时则禁止下拉刷新和上拉加载手势操作，结束滑动后恢复上下拉操作
-        swipeMenuListView.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
+        listView.setOnSwipeListener(new SwipeMenuListView.OnSwipeListener() {
             @Override
             public void onSwipeStart(int position) {
                 refreshlistview.setPullRefreshEnabled(false);

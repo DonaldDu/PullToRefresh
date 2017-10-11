@@ -3,12 +3,14 @@ package com.dhy.pulltorefresh;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
+import com.daimajia.swipe.SwipeLayout;
 import com.jaynm.pulltorefresh.PullToRefreshBase;
 import com.jaynm.pulltorefresh.PullToRefreshListView;
 
@@ -31,6 +33,7 @@ public class ListViewActivity extends Activity implements PullToRefreshBase.OnRe
         setContentView(R.layout.activity_listview);
         handler = new Handler();
         refreshlistview = findViewById(R.id.refreshlistview);
+        refreshlistview.setPullRefreshEnabled(true);
         refreshlistview.setPullLoadEnabled(false);
         refreshlistview.setScrollLoadEnabled(true);
         refreshlistview.setOnRefreshListener(this);
@@ -59,6 +62,39 @@ public class ListViewActivity extends Activity implements PullToRefreshBase.OnRe
         }, 2000);
     }
 
+    SwipeLayout.SwipeListener swipeListener = new SwipeLayout.SwipeListener() {
+        @Override
+        public void onStartOpen(SwipeLayout layout) {
+            refreshlistview.setPullRefreshEnabled(false);
+            Log.i("TAG", "onStartOpen: ");
+        }
+
+        @Override
+        public void onOpen(SwipeLayout layout) {
+
+        }
+
+        @Override
+        public void onStartClose(SwipeLayout layout) {
+
+        }
+
+        @Override
+        public void onClose(SwipeLayout layout) {
+            refreshlistview.setPullRefreshEnabled(true);
+        }
+
+        @Override
+        public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+
+        }
+
+        @Override
+        public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+
+        }
+    };
+
     class MyAdapter extends BaseAdapter {
 
         @Override
@@ -80,6 +116,8 @@ public class ListViewActivity extends Activity implements PullToRefreshBase.OnRe
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.listview_swipe_item, parent, false);
+                SwipeLayout swipeLayout = (SwipeLayout) convertView;
+                swipeLayout.addSwipeListener(swipeListener);
             }
             return convertView;
         }

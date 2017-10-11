@@ -33,8 +33,6 @@ public class SwipeMenuListView extends ListView {
     private SwipeLayout mTouchView;
     private OnSwipeListener mOnSwipeListener;
 
-    private SwipeMenuCreator mMenuCreator;
-    private OnMenuItemClickListener mOnMenuItemClickListener;
     private OnMenuStateChangeListener mOnMenuStateChangeListener;
     private Interpolator mCloseInterpolator;
     private Interpolator mOpenInterpolator;
@@ -260,24 +258,8 @@ public class SwipeMenuListView extends ListView {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getContext().getResources().getDisplayMetrics());
     }
 
-    public void setMenuCreator(SwipeMenuCreator menuCreator) {
-        this.mMenuCreator = menuCreator;
-    }
-
-    public void setOnMenuItemClickListener(OnMenuItemClickListener onMenuItemClickListener) {
-        this.mOnMenuItemClickListener = onMenuItemClickListener;
-    }
-
     public void setOnSwipeListener(OnSwipeListener onSwipeListener) {
         this.mOnSwipeListener = onSwipeListener;
-    }
-
-    public void setOnMenuStateChangeListener(OnMenuStateChangeListener onMenuStateChangeListener) {
-        mOnMenuStateChangeListener = onMenuStateChangeListener;
-    }
-
-    public interface OnMenuItemClickListener {
-        boolean onMenuItemClick(int position, SwipeMenu menu, int index);
     }
 
     public interface OnSwipeListener {

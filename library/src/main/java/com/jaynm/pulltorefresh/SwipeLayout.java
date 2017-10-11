@@ -2,7 +2,6 @@ package com.jaynm.pulltorefresh;
 
 import android.content.Context;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -12,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
+import android.widget.OverScroller;
 
 /**
  * @author caobo
@@ -34,8 +34,7 @@ public class SwipeLayout extends FrameLayout {
     private boolean isFling;
     private int MIN_FLING = dp2px(15);
     private int MAX_VELOCITYX = -dp2px(500);
-    private ScrollerCompat mOpenScroller;
-    private ScrollerCompat mCloseScroller;
+    private OverScroller mOpenScroller, mCloseScroller;
     private int mBaseX;
     private int position;
     private Interpolator mCloseInterpolator;
@@ -69,14 +68,14 @@ public class SwipeLayout extends FrameLayout {
         initFlingDetector();
 
         if (mCloseInterpolator != null) {
-            mCloseScroller = ScrollerCompat.create(getContext(), mCloseInterpolator);
+            mCloseScroller = new OverScroller(getContext(), mCloseInterpolator);
         } else {
-            mCloseScroller = ScrollerCompat.create(getContext());
+            mCloseScroller = new OverScroller(getContext());
         }
         if (mOpenInterpolator != null) {
-            mOpenScroller = ScrollerCompat.create(getContext(), mOpenInterpolator);
+            mOpenScroller = new OverScroller(getContext(), mOpenInterpolator);
         } else {
-            mOpenScroller = ScrollerCompat.create(getContext());
+            mOpenScroller = new OverScroller(getContext());
         }
     }
 
@@ -240,8 +239,7 @@ public class SwipeLayout extends FrameLayout {
     }
 
     private int dp2px(int dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
-                getContext().getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getContext().getResources().getDisplayMetrics());
     }
 
     @Override
