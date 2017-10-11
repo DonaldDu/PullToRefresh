@@ -7,7 +7,6 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 
@@ -61,29 +60,6 @@ public class SwipeMenuListView extends ListView {
         mTouchState = TOUCH_STATE_NONE;
     }
 
-    @Override
-    public void setAdapter(ListAdapter adapter) {
-        super.setAdapter(new SwipeMenuAdapter(getContext(), adapter) {
-            @Override
-            public void createMenu(SwipeMenu menu) {
-                if (mMenuCreator != null) {
-                    mMenuCreator.create(menu);
-                }
-            }
-
-            @Override
-            public void onItemClick(SwipeMenuView view, SwipeMenu menu, int index) {
-                boolean flag = false;
-                if (mOnMenuItemClickListener != null) {
-                    flag = mOnMenuItemClickListener.onMenuItemClick(view.getPosition(), menu, index);
-                }
-                if (mTouchView != null && !flag) {
-                    mTouchView.smoothCloseMenu();
-                }
-            }
-        });
-    }
-
     public void setCloseInterpolator(Interpolator interpolator) {
         mCloseInterpolator = interpolator;
     }
@@ -116,10 +92,11 @@ public class SwipeMenuListView extends ListView {
                 //只在空的时候赋值 以免每次触摸都赋值，会有多个open状态
                 if (view instanceof SwipeLayout) {
                     //如果有打开的就拦截.
-                    if (mTouchView != null && mTouchView.isOpen() && !inRangeOfView(mTouchView.getMenuView(), ev)) {
-                        return true;
-                    }
+//                    if (mTouchView != null && mTouchView.isOpen() && !inRangeOfView(mTouchView.getMenuView(), ev)) {
+//                        return true;
+//                    }
                     mTouchView = (SwipeLayout) view;
+                    mTouchView.setPosition(mTouchPosition);
                     mTouchView.setSwipeDirection(mDirection);
                 }
                 //如果摸在非SwipeMenuLayout上

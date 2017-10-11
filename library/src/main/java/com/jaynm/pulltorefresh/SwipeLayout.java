@@ -11,7 +11,6 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Interpolator;
-import android.widget.AbsListView;
 import android.widget.FrameLayout;
 
 /**
@@ -24,11 +23,11 @@ public class SwipeLayout extends FrameLayout {
 
     private static final int STATE_CLOSE = 0;
     private static final int STATE_OPEN = 1;
+    @SwipeDirection
+    private int mSwipeDirection = SwipeMenuListView.DIRECTION_LEFT_TO_RIGHT;
 
-    private int mSwipeDirection;
-
-    private View mContentView;
-    private SwipeMenuView mMenuView;
+    private View contentView;
+    private View menuView;
     private int mDownX;
     private int state = STATE_CLOSE;
     private GestureDetectorCompat flingDetector;
@@ -44,26 +43,14 @@ public class SwipeLayout extends FrameLayout {
 
     private boolean mSwipEnable = true;
 
-    public SwipeLayout(View contentView, SwipeMenuView menuView) {
-        this(contentView, menuView, null, null);
-    }
-
-    public SwipeLayout(View contentView, SwipeMenuView menuView, Interpolator closeInterpolator, Interpolator openInterpolator) {
-        super(contentView.getContext());
-        mCloseInterpolator = closeInterpolator;
-        mOpenInterpolator = openInterpolator;
-        mContentView = contentView;
-        mMenuView = menuView;
-        mMenuView.setLayout(this);
+    public SwipeLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
         init();
     }
 
-    private SwipeLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    private SwipeLayout(Context context) {
+    public SwipeLayout(Context context) {
         super(context);
+        init();
     }
 
     public int getPosition() {
@@ -72,7 +59,6 @@ public class SwipeLayout extends FrameLayout {
 
     public void setPosition(int position) {
         this.position = position;
-        mMenuView.setPosition(position);
     }
 
     public void setSwipeDirection(int swipeDirection) {
@@ -80,7 +66,6 @@ public class SwipeLayout extends FrameLayout {
     }
 
     private void init() {
-        setLayoutParams(new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         initFlingDetector();
 
         if (mCloseInterpolator != null) {
@@ -93,18 +78,15 @@ public class SwipeLayout extends FrameLayout {
         } else {
             mOpenScroller = ScrollerCompat.create(getContext());
         }
+    }
 
-        LayoutParams contentParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        mContentView.setLayoutParams(contentParams);
-        if (mContentView.getId() < 1) {
-            mContentView.setId(CONTENT_VIEW_ID);
-        }
-
-        mMenuView.setId(MENU_VIEW_ID);
-        mMenuView.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-
-        addView(mContentView);
-        addView(mMenuView);
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        contentView = findViewById(R.id.swipe_layout_content);
+        menuView = findViewById(R.id.swipe_layout_menu);
+        if (contentView == null) contentView = getChildAt(0);
+        if (menuView == null) menuView = getChildAt(1);
     }
 
     void initFlingDetector() {
@@ -143,7 +125,7 @@ public class SwipeLayout extends FrameLayout {
             case MotionEvent.ACTION_MOVE:
                 int dis = (int) (mDownX - event.getX());
                 if (state == STATE_OPEN) {
-                    dis += mMenuView.getWidth() * mSwipeDirection;
+                    dis += menuView.getWidth() * mSwipeDirection;
                 }
                 swipe(dis);
                 break;
@@ -163,7 +145,7 @@ public class SwipeLayout extends FrameLayout {
      * right Direction with fling or more than half menu width
      */
     boolean shouldOpen(MotionEvent event) {
-        return (isFling || Math.abs(mDownX - event.getX()) > (mMenuView.getWidth() / 2))
+        return (isFling || Math.abs(mDownX - event.getX()) > (menuView.getWidth() / 2))
                 && Math.signum(mDownX - event.getX()) == mSwipeDirection;
     }
 
@@ -177,12 +159,12 @@ public class SwipeLayout extends FrameLayout {
         }
         if (Math.signum(dis) != mSwipeDirection) {
             dis = 0;
-        } else if (Math.abs(dis) > mMenuView.getWidth()) {
-            dis = mMenuView.getWidth() * mSwipeDirection;
+        } else if (Math.abs(dis) > menuView.getWidth()) {
+            dis = menuView.getWidth() * mSwipeDirection;
         }
 
-        swipeView(mContentView, -dis);
-        swipeView(mMenuView, mContentView.getWidth() * mSwipeDirection - dis);
+        swipeView(contentView, -dis);
+        swipeView(menuView, contentView.getWidth() * mSwipeDirection - dis);
     }
 
     private void swipeView(View view, int toLeft) {
@@ -207,11 +189,11 @@ public class SwipeLayout extends FrameLayout {
     public void smoothCloseMenu() {
         state = STATE_CLOSE;
         if (mSwipeDirection == SwipeMenuListView.DIRECTION_LEFT_TO_RIGHT) {
-            mBaseX = -mContentView.getLeft();
-            mCloseScroller.startScroll(0, 0, mMenuView.getWidth(), 0, 350);
+            mBaseX = -contentView.getLeft();
+            mCloseScroller.startScroll(0, 0, menuView.getWidth(), 0, 350);
         } else {
-            mBaseX = mMenuView.getRight();
-            mCloseScroller.startScroll(0, 0, mMenuView.getWidth(), 0, 350);
+            mBaseX = menuView.getRight();
+            mCloseScroller.startScroll(0, 0, menuView.getWidth(), 0, 350);
         }
         postInvalidate();
     }
@@ -222,9 +204,9 @@ public class SwipeLayout extends FrameLayout {
         }
         state = STATE_OPEN;
         if (mSwipeDirection == SwipeMenuListView.DIRECTION_LEFT_TO_RIGHT) {
-            mOpenScroller.startScroll(-mContentView.getLeft(), 0, mMenuView.getWidth(), 0, 350);
+            mOpenScroller.startScroll(-contentView.getLeft(), 0, menuView.getWidth(), 0, 350);
         } else {
-            mOpenScroller.startScroll(mContentView.getLeft(), 0, mMenuView.getWidth(), 0, 350);
+            mOpenScroller.startScroll(contentView.getLeft(), 0, menuView.getWidth(), 0, 350);
         }
         postInvalidate();
     }
@@ -245,16 +227,16 @@ public class SwipeLayout extends FrameLayout {
         }
         if (state == STATE_CLOSE) {
             state = STATE_OPEN;
-            swipe(mMenuView.getWidth() * mSwipeDirection);
+            swipe(menuView.getWidth() * mSwipeDirection);
         }
     }
 
     public View getContentView() {
-        return mContentView;
+        return contentView;
     }
 
-    public SwipeMenuView getMenuView() {
-        return mMenuView;
+    public View getMenuView() {
+        return menuView;
     }
 
     private int dp2px(int dp) {
@@ -263,26 +245,20 @@ public class SwipeLayout extends FrameLayout {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        mMenuView.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
-    }
-
-    @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        mContentView.layout(0, 0, getMeasuredWidth(), mContentView.getMeasuredHeight());
+        contentView.layout(0, 0, getMeasuredWidth(), contentView.getMeasuredHeight());
 
-        l = mSwipeDirection == SwipeMenuListView.DIRECTION_RIGHT_TO_LEFT ? -mMenuView.getMeasuredWidth() : mContentView.getMeasuredWidth();
-        r = l + mMenuView.getMeasuredWidth();
-        mMenuView.layout(l, 0, r, mMenuView.getMeasuredHeight());
+        l = mSwipeDirection == SwipeMenuListView.DIRECTION_RIGHT_TO_LEFT ? -menuView.getMeasuredWidth() : contentView.getMeasuredWidth();
+        r = l + menuView.getMeasuredWidth();
+        menuView.layout(l, 0, r, menuView.getMeasuredHeight());
     }
 
     public void setMenuHeight(int measuredHeight) {
         Log.i("byz", "pos = " + position + ", height = " + measuredHeight);
-        LayoutParams params = (LayoutParams) mMenuView.getLayoutParams();
+        LayoutParams params = (LayoutParams) menuView.getLayoutParams();
         if (params.height != measuredHeight) {
             params.height = measuredHeight;
-            mMenuView.setLayoutParams(mMenuView.getLayoutParams());
+            menuView.setLayoutParams(menuView.getLayoutParams());
         }
     }
 

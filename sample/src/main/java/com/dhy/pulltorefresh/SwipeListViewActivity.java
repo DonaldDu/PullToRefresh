@@ -1,24 +1,18 @@
 package com.dhy.pulltorefresh;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.jaynm.pulltorefresh.PullToRefreshBase;
 import com.jaynm.pulltorefresh.PullToRefreshMenuView;
 import com.jaynm.pulltorefresh.SwipeMenu;
-import com.jaynm.pulltorefresh.SwipeMenuCreator;
-import com.jaynm.pulltorefresh.SwipeMenuItem;
 import com.jaynm.pulltorefresh.SwipeMenuListView;
-import com.jaynm.pulltorefresh.Utils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +25,7 @@ import java.util.List;
  */
 
 public class SwipeListViewActivity extends Activity implements PullToRefreshBase.OnRefreshListener<SwipeMenuListView> {
-
+    Activity activity;
     private PullToRefreshMenuView refreshlistview;
 
     private SwipeMenuListView swipeMenuListView;
@@ -51,47 +45,21 @@ public class SwipeListViewActivity extends Activity implements PullToRefreshBase
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_swipelistview);
+        activity = this;
         pullData = new LinkedList<>();
         refreshlistview = findViewById(R.id.refreshlistview);
         refreshlistview.setPullLoadEnabled(false);
         refreshlistview.setScrollLoadEnabled(true);
         refreshlistview.setOnRefreshListener(this);
         swipeMenuListView = refreshlistview.getRefreshableView();
-        adapter = new ListAdapter(getData());
+        adapter = new ListAdapter();
         swipeMenuListView.setAdapter(adapter);
         refreshlistview.onRefreshComplete();
-
-        // 创建左滑弹出的item
-        SwipeMenuCreator creator = new SwipeMenuCreator() {
-
-            @Override
-            public void create(SwipeMenu menu) {
-                // 创建Item
-                SwipeMenuItem openItem = new SwipeMenuItem(getApplicationContext());
-                // 设置item的背景颜色
-                openItem.setBackground(new ColorDrawable(Color.RED));
-                // 设置item的宽度
-                openItem.setWidth(Utils.dip2px(SwipeListViewActivity.this, 90));
-                // 设置item标题
-                openItem.setTitle("删除");
-                // 设置item字号
-                openItem.setTitleSize(18);
-                // 设置item字体颜色
-                openItem.setTitleColor(Color.WHITE);
-                // 添加到ListView的Item布局当中
-                menu.addMenuItem(openItem);
-            }
-        };
-        // set creator
-        swipeMenuListView.setMenuCreator(creator);
-
         // 操作删除按钮的点击事件
         swipeMenuListView.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
-
                 Toast.makeText(SwipeListViewActivity.this, "删除" + pullData.get(position), Toast.LENGTH_LONG).show();
-
                 return false;
             }
         });
@@ -180,20 +148,15 @@ public class SwipeListViewActivity extends Activity implements PullToRefreshBase
     }
 
     public class ListAdapter extends BaseAdapter {
-        private List<String> listData;
-
-        ListAdapter(List<String> listData) {
-            this.listData = listData;
-        }
 
         @Override
         public int getCount() {
-            return listData.size();
+            return 10;
         }
 
         @Override
         public Object getItem(int position) {
-            return listData.get(position);
+            return 0;
         }
 
         @Override
@@ -203,21 +166,10 @@ public class SwipeListViewActivity extends Activity implements PullToRefreshBase
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
             if (convertView == null) {
-                convertView = LayoutInflater.from(SwipeListViewActivity.this).inflate(R.layout.listview_item, null);
-                viewHolder = new ViewHolder();
-                viewHolder.textview = convertView.findViewById(R.id.textview);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+                convertView = LayoutInflater.from(activity).inflate(R.layout.listview_item, parent, false);
             }
-            viewHolder.textview.setText(listData.get(position));
             return convertView;
-        }
-
-        class ViewHolder {
-            TextView textview;
         }
     }
 
