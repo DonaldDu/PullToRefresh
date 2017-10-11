@@ -15,6 +15,8 @@ import com.jaynm.pulltorefresh.PullToRefreshListView;
 /**
  * Created by caobo on 2016/11/1 0001.
  * ListView下拉刷新、上拉加载更多
+ * <p>
+ * 这个在魅族手机侧滑删除菜单【不能正常使用】
  */
 
 public class ListViewActivity extends Activity implements PullToRefreshBase.OnRefreshListener<ListView> {

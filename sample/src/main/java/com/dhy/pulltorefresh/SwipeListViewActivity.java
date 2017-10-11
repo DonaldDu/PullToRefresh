@@ -25,7 +25,9 @@ import java.util.List;
 
 /**
  * Created by caobo on 2016/11/1 0001.
- * ListView上拉刷新、下拉加載更多+左滑刪除
+ * ListView上拉刷新、下拉加載更多+左滑刪除。
+ * <p>
+ * 这个在魅族手机侧滑删除菜单【能正常使用】
  */
 
 public class SwipeListViewActivity extends Activity implements PullToRefreshBase.OnRefreshListener<SwipeMenuListView> {
