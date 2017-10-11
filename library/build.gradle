@@ -4,7 +4,6 @@ android {
     compileSdkVersion 26
     buildToolsVersion "26.0.2"
 
-
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
@@ -31,5 +30,4 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
 }
